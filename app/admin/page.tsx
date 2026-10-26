@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { getEserler, Eser } from '@/data';
+import { getEserler, Eser } from '@/app/data';
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
