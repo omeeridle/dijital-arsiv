@@ -3,7 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { motion, useScroll, useSpring } from 'framer-motion';
 import Link from 'next/link';
-import { eserler } from '../../data';
+import { eserler } from '../../../data';
 
 export default function EserDetay({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
