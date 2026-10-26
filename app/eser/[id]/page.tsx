@@ -85,13 +85,11 @@ export default function EserDetay({ params }: { params: Promise<{ id: string }> 
 
           <div className="flex flex-col md:flex-row gap-12 md:gap-24 items-start">
             
-            {/* SOL SÜTUN: Önce Başlık, Altında Çok Minimal Detay Butonu */}
             <div className="w-full md:w-1/3 md:sticky md:top-32 space-y-3">
               <h1 className="text-2xl md:text-3xl font-serif tracking-wide text-gray-900 leading-tight">
                 {currentEser.title}
               </h1>
 
-              {/* Çok daha sade, satır içi minimal detay butonu */}
               <div>
                 <button
                   onClick={() => setIsMetaOpen(!isMetaOpen)}
@@ -132,7 +130,6 @@ export default function EserDetay({ params }: { params: Promise<{ id: string }> 
               </div>
             </div>
 
-            {/* SAĞ SÜTUN: Galeri, İçerik ve Kompakt Alıntı */}
             <div className="w-full md:w-2/3 flex flex-col space-y-8">
               
               <div className="relative group">
@@ -178,7 +175,6 @@ export default function EserDetay({ params }: { params: Promise<{ id: string }> 
                 </p>
               )}
 
-              {/* Paragraflar ve Devamını Oku */}
               <div className="space-y-6 md:space-y-8 w-full">
                 {isExpanded || !isLongText ? (
                   currentEser.content.map((paragraph: string, idx: number) => (
@@ -205,7 +201,6 @@ export default function EserDetay({ params }: { params: Promise<{ id: string }> 
                 )}
               </div>
 
-              {/* Felsefi Alıntı (Boşluklar azaltıldı, daha kompakt) */}
               {currentEser.quote && (
                 <blockquote className="w-full py-4 md:py-5 border-l border-gray-200 pl-5 my-2">
                   <p className="font-serif text-base md:text-lg text-gray-900 italic leading-relaxed">
@@ -217,7 +212,6 @@ export default function EserDetay({ params }: { params: Promise<{ id: string }> 
             </div>
           </div>
 
-          {/* En Alttaki Tek "Sonraki Eser" Butonu */}
           <div className="w-full mt-20 md:mt-28 pt-12 border-t border-gray-100 flex justify-end">
             <Link href={`/eser/${nextId}`} className="group text-right">
               <h2 className="text-lg md:text-xl font-serif text-gray-900 group-hover:opacity-50 transition-opacity flex items-center gap-3">
