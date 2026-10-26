@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
-import { eserler } from './data';
+import { getEserler, Eser } from './data';
 
-function ArchiveItem({ eser, index, setActiveBg }: { eser: any, index: number, setActiveBg: (color: string) => void }) {
+function ArchiveItem({ eser, index, setActiveBg }: { eser: Eser, index: number, setActiveBg: (color: string) => void }) {
   const isEven = index % 2 === 0;
   const ref = useRef(null);
   
@@ -22,30 +22,51 @@ function ArchiveItem({ eser, index, setActiveBg }: { eser: any, index: number, s
     });
   }, [scrollYProgress, eser.bgColor, setActiveBg]);
   
-  const imageY = useTransform(scrollYProgress, [0, 1], ["-15%", "15%"]);
+  const imageY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
 
   return (
-    <article className={`flex flex-col md:flex-row items-center justify-center gap-16 w-full ${isEven ? '' : 'md:flex-row-reverse'}`} ref={ref}>
+    <article className={`flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 w-full ${isEven ? '' : 'md:flex-row-reverse'}`} ref={ref}>
       
-      {/* Resim ve Altındaki Gözlemi İncele Butonu */}
-      <div className="flex flex-col items-center w-full max-w-[260px] shrink-0 group">
+      {/* Resim Alanı (Mobilde tam genişlik/oran uyumlu) */}
+      <div className="flex flex-col items-center w-full max-w-[280px] md:max-w-[260px] shrink-0 group">
         <Link href={`/eser/${eser.id}`} className="w-full">
           <div className="aspect-[3/4] overflow-hidden bg-white/50 cursor-pointer border border-black/5 p-2 relative shadow-sm">
             <motion.div
-              style={{ y: imageY, scale: 1.15 }}
+              style={{ y: imageY, scale: 1.1 }}
               className="w-full h-full absolute inset-0"
             >
               <img 
                 src={eser.coverImage} 
                 alt={eser.title} 
-                className="w-full h-full object-cover grayscale transition-all duration-[2000ms] group-hover:grayscale-0" 
+                className="w-full h-full object-cover" 
               />
             </motion.div>
           </div>
         </Link>
+      </div>
+      
+      {/* Bilgi Alanı (Mobilde ortalanmış, masüstünde sola dayalı) */}
+      <motion.div 
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true, margin: "-10%" }}
+        transition={{ duration: 1.2, delay: 0.2 }}
+        className="flex flex-col justify-center space-y-3 max-w-[320px] text-center md:text-left"
+      >
+        <div className="flex flex-col space-y-1 items-center md:items-start">
+          <p className="text-[7px] tracking-[0.4em] text-gray-400 uppercase">
+            ref 0{index + 1} // {eser.classification}
+          </p>
+        </div>
+        
+        <Link href={`/eser/${eser.id}`}>
+          <h2 className="text-xl font-serif text-gray-900 tracking-wide hover:opacity-50 transition-opacity pt-1">
+            {eser.title}
+          </h2>
+        </Link>
 
-        {/* Gözlemi İncele Yazısı ve Tarih - Resmin Tam Altında */}
-        <div className="w-full flex justify-between items-center pt-4 px-1">
+        {/* Mevsim / Tarih ve İncele Butonu */}
+        <div className="w-full flex justify-between items-center pt-2 px-2 md:px-0">
           <span className="text-[7px] text-gray-400 tracking-[0.3em] uppercase">
             {eser.date}
           </span>
@@ -55,30 +76,6 @@ function ArchiveItem({ eser, index, setActiveBg }: { eser: any, index: number, s
             </span>
           </Link>
         </div>
-      </div>
-      
-      {/* Sağ Taraf: Sadece Başlık, Koordinat ve Sınıflandırma (Kısa açıklama silindi) */}
-      <motion.div 
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "-10%" }}
-        transition={{ duration: 1.2, delay: 0.2 }}
-        className="flex flex-col justify-center space-y-4 max-w-[320px] text-center md:text-left"
-      >
-        <div className="flex flex-col space-y-1">
-          <p className="text-[7px] tracking-[0.4em] text-gray-400 uppercase">
-            ref 0{index + 1} // {eser.classification}
-          </p>
-          <p className="text-[8px] tracking-[0.25em] text-gray-500 uppercase">
-            {eser.coordinates}
-          </p>
-        </div>
-        
-        <Link href={`/eser/${eser.id}`}>
-          <h2 className="text-xl font-serif text-gray-900 tracking-wide hover:opacity-50 transition-opacity pt-2">
-            {eser.title}
-          </h2>
-        </Link>
       </motion.div>
     </article>
   );
@@ -89,9 +86,11 @@ export default function PremiumGallery() {
   const [isMounted, setIsMounted] = useState(false);
   const [crypticText, setCrypticText] = useState("sys.init...");
   const [activeBg, setActiveBg] = useState("#FDFDFD");
+  const [eserlerListesi, setEserlerListesi] = useState<Eser[]>([]);
 
   useEffect(() => { 
     setIsMounted(true);
+    setEserlerListesi(getEserler());
     
     let iteration = 0;
     const interval = setInterval(() => {
@@ -146,10 +145,9 @@ export default function PremiumGallery() {
         transition={{ duration: 1.8, ease: "easeInOut" }}
         className="min-h-screen text-[#111] font-sans selection:bg-gray-200 transition-colors"
       >
-        <main className="max-w-[900px] mx-auto px-6 py-32 flex flex-col items-center">
+        <main className="max-w-[900px] mx-auto px-6 py-20 md:py-32 flex flex-col items-center">
           
-          {/* Üstteki 'Evrensel Gözlem Kayıtları' yazısı tamamen silindi, sadece ana başlık kaldı */}
-          <header className="mb-40 text-center flex flex-col items-center">
+          <header className="mb-24 md:mb-40 text-center flex flex-col items-center">
             <motion.h1 
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
@@ -160,8 +158,8 @@ export default function PremiumGallery() {
             </motion.h1>
           </header>
 
-          <div className="w-full flex flex-col items-center space-y-40 pb-24">
-            {eserler.map((eser, index) => (
+          <div className="w-full flex flex-col items-center space-y-28 md:space-y-40 pb-24">
+            {eserlerListesi.map((eser, index) => (
               <ArchiveItem key={eser.id} eser={eser} index={index} setActiveBg={setActiveBg} />
             ))}
           </div>

@@ -1,4 +1,19 @@
-export const eserler = [
+export interface Eser {
+  id: string;
+  title: string;
+  location: string;
+  coordinates: string;
+  date: string;
+  classification: string;
+  bgColor: string;
+  coverImage: string;
+  shortDescription: string;
+  content: string[];
+  quote: string;
+  media: { type: 'image' | 'video'; url: string }[];
+}
+
+const defaultEserler: Eser[] = [
   {
     id: "agaclarin-fisiltisi",
     title: "ağaçların fısıltısı",
@@ -99,7 +114,7 @@ export const eserler = [
     ]
   },
   {
-    id: "derin-okyanus-sessizligi",
+    id: "derin-okyanus-sessizliği",
     title: "hadal çukuru",
     location: "mariana çukuru",
     coordinates: "11° 21' n — 142° 12' e",
@@ -118,3 +133,36 @@ export const eserler = [
     ]
   }
 ];
+
+export function getEserler(): Eser[] {
+  if (typeof window === 'undefined') return defaultEserler;
+  try {
+    const saved = localStorage.getItem('custom_eserler');
+    if (saved) {
+      const customParsed: Eser[] = JSON.parse(saved);
+      
+      // Varsayılan eserlerin üzerine localStorage'da güncellenmiş hallerini giydirelim (Kopya oluşmasını engeller)
+      const mergedDefault = defaultEserler.map(def => {
+        const foundCustom = customParsed.find(c => c.id === def.id);
+        return foundCustom ? foundCustom : def;
+      });
+
+      // Varsayılanlarda olmayan, tamamen sıfırdan eklenen yeni eserleri ayıralım
+      const defaultIds = defaultEserler.map(d => d.id);
+      const brandNewCustom = customParsed.filter(c => !defaultIds.includes(c.id));
+
+      return [...mergedDefault, ...brandNewCustom];
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  return defaultEserler;
+}
+
+// Tek bir eseri ID'ye göre hem varsayılan hem localStorage'dan bulan fonksiyon
+export function getEserById(id: string): Eser | undefined {
+  const all = getEserler();
+  return all.find((e) => e.id === id);
+}
+
+export const eserler = defaultEserler;
